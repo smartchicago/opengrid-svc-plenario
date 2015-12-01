@@ -1,0 +1,78 @@
+{"_id":{"$oid":"560576d8a3db5f198c1e3b28"},
+"datasets":
+    [
+        {  
+            "id": "food_inspections",
+            "displayName": "City of Chicago: This information is derived from inspections of restaurants and other food establishments in Chicago from January 1, 2010 to the present. Inspections are performed by staff from the Chicago Department of Public Health\u2019s Food Protection Program using a standardized procedure. The results of the inspection are inputted into a database, then reviewed and approved by a State of Illinois Licensed Environmental Health Practitioner (LEHP). For descriptions of the data elements included in this set, go to http://bit.ly/tS9IE8  \r\nDisclaimer: Attempts have been made to minimize any and all duplicate inspection reports. However, the dataset may still contain such duplicates and the appropriate precautions should be exercised when viewing or analyzing these data. The result of the inspections (pass, pass with conditions or fail) as well as the violations noted are based on the findings identified and reported by the inspector at the time of the inspection, and may not reflect the findings noted at other times. For more information about Food Inspections, go to http://bit.ly/tD91Sb.",
+            "options": {
+                "rendition": {
+                    "icon":"default",
+                    "color": "cyan",
+                    "fillColor": "yellow",
+                    "opacity":50,
+                    "size":10
+                }
+            },
+            "columns": [
+                {"id":"311_service_requests_alley_lights_out_row_id", "displayName":"ID", "dataType":"number", "filter":false, "popup":false, "list":false},
+                {"id":"start_date", "displayName":"Start Date", "dataType":"date", "filter":true, "popup":true, "list":true, "sortOrder":1},
+                {"id":"end_date", "displayName":"End Date", "dataType":"date", "filter":true, "popup":true, "list":true, "sortOrder":2},
+                {"id":"current_flag", "displayName":"Current", "dataType":"number", "filter":true, "popup":true, "list":true, "sortOrder":3},
+                {"id":"dup_ver", "displayName":"Dup Ver", "dataType":"number", "filter":true, "popup":true, "list":true, "sortOrder":4},
+                {"id":"inspection_id", "displayName":"Inspection Id", "dataType":"number", "filter":true, "popup":true, "list":true, "sortOrder":5},
+                {"id":"dba_name", "displayName":"DBA Name", "dataType":"string", "filter":true, "popup":true, "list":true, "sortOrder":5},
+                {"id":"aka_name", "displayName":"AKA Name", "dataType":"string", "filter":true, "popup":true, "list":true, "sortOrder":6, "values":[60601,60602]},
+                {"id":"license", "displayName":"License", "dataType":"number", "popup":true, "list":true, "sortOrder":7},
+                {"id":"facility_type", "displayName":"Facility Type", "dataType":"string", "popup":true, "sortOrder":7},
+                {"id":"risk", "displayName":"Risk", "dataType":"string", "list":true, "sortOrder":8},
+                {"id":"address", "displayName":"Address", "dataType":"string", "list":true, "sortOrder":9},
+                {"id":"city", "displayName":"City", "dataType":"string", "list":true, "sortOrder":10},
+                {"id":"state", "displayName":"State", "dataType":"string", "list":true, "sortOrder":11},
+                {"id":"zip", "displayName":"Zip", "dataType":"number", "list":true, "sortOrder":12},
+                {"id":"inspection_date", "displayName":"Inspection Date", "dataType":"date", "list":true, "sortOrder":13},
+                {"id":"inspection_type", "displayName":"Inspection Type", "dataType":"date", "list":true, "sortOrder":14},
+                {"id":"results", "displayName":"Results", "dataType":"string", "popup":true, "sortOrder":15},
+                {"id":"violations", "displayName":"Violations", "dataType":"string", "list":true, "sortOrder":16},
+                {"id":"latitude", "displayName":"Latitude", "dataType":"float", "list":true, "sortOrder":17},
+                {"id":"longitude", "displayName":"Longitude", "dataType":"float", "list":true, "sortOrder":18},
+                {"id":"location", "displayName":"Location", "dataType":"string", "list":true, "sortOrder":19}
+            ]
+        },
+        {  
+                     "id": "311_service_requests_alley_lights_out",
+            "displayName": "City of Chicago: This dataset contains all open 311 reports of one or more lights out on a wooden pole in the alley and all completed requests since January 1, 2011.  If two requests regarding the same address are made within 30 calendar days of each other, the newest CSR is automatically given the status of \u201cDuplicate (Open)\u201d.   Once the alley light is repaired, the CSR status will read \u201cCompleted\u201d for the original request and \u201cDuplicate (Closed)\u201d for any duplicate requests. Data is updated daily.",
+            "options": {
+             "rendition": {
+                 "icon":"default",
+                 "color": "cyan",
+                 "fillColor": "#f03",
+                 "opacity":80,
+                 "size":10
+             }
+            },
+            "columns": [
+                {"id":"311_service_requests_alley_lights_out_row_id", "displayName":"ID", "dataType":"number", "filter":false, "popup":false, "list":false},
+                {"id":"start_date", "displayName":"Start Date", "dataType":"date", "filter":true, "popup":true, "list":true, "sortOrder":1},
+                {"id":"end_date", "displayName":"End Date", "dataType":"date", "filter":true, "popup":true, "list":true, "sortOrder":2},
+                {"id":"current_flag", "displayName":"Current", "dataType":"number", "filter":true, "popup":true, "list":true, "sortOrder":3},
+                {"id":"dup_ver", "displayName":"Dup Ver", "dataType":"number", "filter":true, "popup":true, "list":true, "sortOrder":4},
+                {"id":"creation_date", "displayName":"Creation Date", "dataType":"date", "filter":true, "popup":true, "list":true, "sortOrder":5},
+                {"id":"status", "displayName":"Status", "dataType":"string", "filter":true, "popup":true, "list":true, "sortOrder":5},
+                {"id":"completion_date", "displayName":"Completion Date", "dataType":"date", "filter":true, "popup":true, "list":true, "sortOrder":6, "values":[60601,60602]},
+                {"id":"service_request_number", "displayName":"Service Request Number", "dataType":"string", "popup":true, "list":true, "sortOrder":7},
+                {"id":"type_of_service_request", "displayName":"Type of Service Request", "dataType":"string", "popup":true, "sortOrder":7},
+                {"id":"street_address", "displayName":"Street Address", "dataType":"string", "list":true, "sortOrder":8},
+                {"id":"zip_code", "displayName":"Zip Code", "dataType":"number", "list":true, "sortOrder":9},
+                {"id":"x_coordinate", "displayName":"X Coordinate", "dataType":"float", "list":true, "sortOrder":10},
+                {"id":"y_coordinate", "displayName":"Y Coordinate", "dataType":"float", "list":true, "sortOrder":11},
+                {"id":"ward", "displayName":"Ward", "dataType":"number", "list":true, "sortOrder":12},
+                {"id":"police_district", "displayName":"Police District", "dataType":"number", "list":true, "sortOrder":13},
+                {"id":"community_area", "displayName":"Community Area", "dataType":"number", "list":true, "sortOrder":14},
+                {"id":"latitude", "displayName":"Latitude", "dataType":"float", "list":true, "sortOrder":15},
+                {"id":"longitude", "displayName":"Longitude", "dataType":"float", "list":true, "sortOrder":16},
+                {"id":"location", "displayName":"Location", "dataType":"string", "list":true, "sortOrder":17}
+            ]
+        }
+    ]
+    
+}

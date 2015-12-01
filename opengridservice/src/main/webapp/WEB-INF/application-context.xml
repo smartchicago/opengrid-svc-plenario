@@ -49,12 +49,14 @@
 	<bean id="groupDataProvider" class="org.opengrid.data.impl.GroupMongoDataProvider"/>
 	<bean id="groupDataUpdater" class="org.opengrid.data.impl.GroupMongoDataProvider"/>
 	<bean id="omniDataProvider" class="org.opengrid.data.impl.OmniMongoDataProvider"/>
+        
+        <bean id="plenarioDataProvider" class="org.opengrid.data.impl.PlenarioDataProvider"/>
 	
 	<!-- security beans  -->
 	<bean id="authManager" class="org.opengrid.security.impl.DBAuthenticationProvider"/>
-	<bean id="userDetailsService" class="org.opengrid.security.impl.MongoUserService"/>	
-	<bean id="roleAccessValidator" class="org.opengrid.security.impl.JwtRoleAccessValidator"/>
-	<bean id="tokenAuthService" class="org.opengrid.security.impl.MongoTokenAuthenticationService"/>
+	<bean id="userDetailsService" class="org.opengrid.security.impl.NoAuthUserService"/>	
+	<bean id="roleAccessValidator" class="org.opengrid.security.impl.NoAuthRoleAccessValidator"/>
+	<bean id="tokenAuthService" class="org.opengrid.security.impl.NoAuthTokenAuthenticationService"/>
 	
 	<!--  other implementations are file-based; comment our bean definitions above to switch to the impls below --> 
 	<!-- <bean id="twitterDataProvider" class="org.opengrid.data.impl.TwitterFileDataProvider"/>

@@ -20,7 +20,7 @@ public class SecurityTest {
 	public static void cleanupTest() {
 	}
 	
-	@Test
+	//@Test
 	public void t1_ValidateUser()  {
 		//positive test to validate a good user
 		MongoUserService ms = new MongoUserService();

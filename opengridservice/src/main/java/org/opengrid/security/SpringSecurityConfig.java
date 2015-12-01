@@ -2,7 +2,7 @@ package org.opengrid.security;
 
 import javax.annotation.Resource;
 
-import org.opengrid.security.impl.MongoTokenAuthenticationService;
+import org.opengrid.security.impl.NoAuthTokenAuthenticationService;
 import org.opengrid.util.PropertiesManager;
 import org.opengrid.util.ServiceProperties;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +38,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         //tokenAuthenticationService = new TokenAuthenticationService(properties.getStringProperty("auth.key"));
         
         //TODO: update to use dep injection that works with WebSecurityConfigurerAdapter
-        tokenAuthenticationService = new MongoTokenAuthenticationService();
+        tokenAuthenticationService = new NoAuthTokenAuthenticationService();
         tokenAuthenticationService.setKey(properties.getStringProperty("auth.key"));
     }
  

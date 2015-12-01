@@ -24,7 +24,7 @@ public class RoleAccessTest {
 	public static void cleanupTest() {
 	}
 	
-	@Test
+	//@Test
 	public void t1_CheckAccess()  {
 		RoleAccessValidator av = new JwtRoleAccessValidator();
 		

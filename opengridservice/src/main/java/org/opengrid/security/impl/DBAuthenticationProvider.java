@@ -45,8 +45,11 @@ public class DBAuthenticationProvider extends  AbstractUserDetailsAuthentication
 	   UserDetails loadedUser;
 	
 	   try {
-		   
-		   loadedUser = this.getUserDetailsService().loadUserByUsername(username);
+		   if (username.equals("NoAuth"))
+                   {
+                       setUserDetailsService(new NoAuthUserService());
+                   }
+                   loadedUser = this.getUserDetailsService().loadUserByUsername(username);
 		   
 	   } catch (UsernameNotFoundException notFound) {
 	       throw notFound;

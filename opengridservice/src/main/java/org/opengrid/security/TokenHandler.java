@@ -30,14 +30,14 @@ public final class TokenHandler {
         //this.secret = secret;
         
         //TODO: look at why this is not being injected fomr app context
-        this.userService = new org.opengrid.security.impl.MongoUserService();
+        this.userService = new org.opengrid.security.impl.NoAuthUserService();
     }
     
     public TokenHandler(String secret) {
         this.secret = secret;
         
         //TODO: look at why this is not being injected fomr app context
-        this.userService = new org.opengrid.security.impl.MongoUserService();
+        this.userService = new org.opengrid.security.impl.NoAuthUserService();
     }
     
     public void setSecret(String secret) {

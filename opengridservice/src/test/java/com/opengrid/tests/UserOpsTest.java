@@ -29,7 +29,7 @@ public class UserOpsTest {
 	public static void cleanupTest() {
 	}
 	
-	@Test
+	//@Test
 	public void t1_addUser()  {
 		UserMongoDataProvider o = new UserMongoDataProvider();
 		
@@ -65,7 +65,7 @@ public class UserOpsTest {
 	}
 
 
-	@Test
+	//@Test
 	public void t2_getOneUser()  {
 		UserMongoDataProvider o = new UserMongoDataProvider();
 		
@@ -82,7 +82,7 @@ public class UserOpsTest {
 		assertTrue("userId from user json object returned by getOneUser does not match saved user's.", ( (String)u.get("userId")).equals(userIds.get(0)) );
 	}
 	
-	@Test
+	//@Test
 	public void t3_listAllTestUsers()  {
 		//add one more user
 		UserMongoDataProvider o = new UserMongoDataProvider();
@@ -113,7 +113,7 @@ public class UserOpsTest {
 		assertTrue("User count is not the same as expected count", a.length() == 2 );
 	}
 	
-	@Test
+	//@Test
 	public void t4_updateUser()  {
 		UserMongoDataProvider o = new UserMongoDataProvider();
 		
@@ -130,7 +130,7 @@ public class UserOpsTest {
 		assertTrue("Updated user last name does not equal expected value", ( (String)u.get("lastName") ).equals("newLastName" ));
 	}
 	
-	@Test
+	//@Test
 	public void t5_deleteTestUsers()  {
 		//delete our test users
 		UserMongoDataProvider o = new UserMongoDataProvider();

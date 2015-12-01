@@ -29,7 +29,7 @@ public class QueryOpsTest {
 	public static void cleanupTest() {
 	}
 	
-	@Test
+	//@Test
 	public void t1_addQuery()  {
 		QueryMongoDataProvider o = new QueryMongoDataProvider();
 		
@@ -59,7 +59,7 @@ public class QueryOpsTest {
 	}
 
 
-	@Test
+	//@Test
 	public void t2_getOneQuery()  {
 		QueryMongoDataProvider o = new QueryMongoDataProvider();
 		
@@ -76,7 +76,7 @@ public class QueryOpsTest {
 		assertTrue("name from query json object returned by getOneGroup does not match saved query's.", ( (String)u.get("name")).equals(queryIds.get(0)) );
 	}
 	
-	@Test
+	//@Test
 	public void t3_listAllTestQueries()  {
 		//add one more user
 		QueryMongoDataProvider o = new QueryMongoDataProvider();
@@ -107,7 +107,7 @@ public class QueryOpsTest {
 		assertTrue("Query count is not the same as expected count", a.length() == 2 );
 	}
 	
-	@Test
+	//@Test
 	public void t4_updateQuery()  {
 		QueryMongoDataProvider o = new QueryMongoDataProvider();
 		
@@ -124,7 +124,7 @@ public class QueryOpsTest {
 		assertTrue("Updated query name does not equal expected value", ( (String)u.get("owner") ).equals("newName" ));
 	}
 	
-	@Test
+	//@Test
 	public void t5_deleteTestQueries()  {
 		//delete our test querys
 		QueryMongoDataProvider o = new QueryMongoDataProvider();

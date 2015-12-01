@@ -30,7 +30,7 @@ public class GroupOpsTest {
 	public static void cleanupTest() {
 	}
 	
-	@Test
+	//@Test
 	public void t0_addGroup()  {
 		GroupMongoDataProvider o = new GroupMongoDataProvider();
 		
@@ -45,7 +45,7 @@ public class GroupOpsTest {
 		assertTrue("groupId from user json object returned by addGroup does not match saved group's.", ( (String)u.get("groupId")).equals(groupIds.get(0)) );
 	}
 
-	@Test
+	//@Test
 	public void t1_DeleteGroupWithUsers()  {
 		//add user to our test group
 		testUserId = addUser(groupIds.get(0));
@@ -109,7 +109,7 @@ public class GroupOpsTest {
 	}
 
 
-	@Test
+	//@Test
 	public void t2_getOneGroup()  {
 		GroupMongoDataProvider o = new GroupMongoDataProvider();
 		
@@ -126,7 +126,7 @@ public class GroupOpsTest {
 		assertTrue("groupId from group json object returned by getOneGroup does not match saved group's.", ( (String)u.get("groupId")).equals(groupIds.get(0)) );
 	}
 	
-	@Test
+	//@Test
 	public void t3_listAllTestGroups()  {
 		//add one more user
 		GroupMongoDataProvider o = new GroupMongoDataProvider();
@@ -157,7 +157,7 @@ public class GroupOpsTest {
 		assertTrue("Group count is not the same as expected count", a.length() == 2 );
 	}
 	
-	@Test
+	//@Test
 	public void t4_updateGroup()  {
 		GroupMongoDataProvider o = new GroupMongoDataProvider();
 		
@@ -174,7 +174,7 @@ public class GroupOpsTest {
 		assertTrue("Updated group name does not equal expected value", ( (String)u.get("name") ).equals("newName" ));
 	}
 	
-	@Test
+	//@Test
 	public void t5_deleteTestGroups()  {
 		//delete test user to prevent restriction
 		deleteTestUser(testUserId);
