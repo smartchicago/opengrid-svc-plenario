@@ -127,5 +127,43 @@ public class PlenarioSearchTest {
 			assertTrue("Unexpected exception message on bad dataset ID", ex.getMessage().indexOf("Cannot find dataset descriptor") > -1);
 		}
 	}
+        
+        @Test
+	public void t6_SearchDatasetID() {
+		GenericRetrievable gr = new PlenarioDataProvider();
+		try {
+			String a = gr.getData("311_service_requests_pot_holes_reported", 
+					"", 
+					"{\"$and\":[{\"start_date\":{\"$gte\":\"12/01/2015\",\"$lte\":\"12/03/2015\"}}]}", //filter
+					6000,
+					null);
+                        
+                        com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
+                        JsonElement object = parser.parse(a);
+                        
+			assertTrue("Result cannot be null", a !=null);
+		} catch (Exception ex) {
+			assertTrue("Unexpected exception message on bad dataset ID", ex.getMessage().indexOf("Cannot find dataset descriptor") > -1);
+		}
+	}
+        
+        @Test
+	public void t7_SearchDatasetID() {
+		GenericRetrievable gr = new PlenarioDataProvider();
+		try {
+			String a = gr.getData("311_service_requests_pot_holes_reported", 
+					"", 
+					"{\"$and\":[{\"service_request_number\":{\"$regex\":\"^6\"}}]}", //filter
+					6000,
+					null);
+                        
+                        com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
+                        JsonElement object = parser.parse(a);
+                        
+			assertTrue("Result cannot be null", a !=null);
+		} catch (Exception ex) {
+			assertTrue("Unexpected exception message on bad dataset ID", ex.getMessage().indexOf("Cannot find dataset descriptor") > -1);
+		}
+	}
 }
 

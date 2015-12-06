@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,8 +55,8 @@ public class PlenarioDataProvider implements GenericRetrievable {
             
                 StringBuilder sURL = new StringBuilder();
                 StringBuilder sb = new StringBuilder();
-                sURL.append("http://plenar.io/v1/api/detail/?dataset_name=" + dataSetId); //just a string
-
+                sURL.append("http://plenar.io/v1/api/detail/?dataset_name=" + dataSetId + "&dup_ver=1&obs_date__ge=2000-1-1"); //just a string
+                sURL.append("&location_geom__within={\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-89.961548,42.561173],[-87.033691,42.561173],[-87.033691,39.609920],[-89.961548,39.609920],[-89.961548,42.561173]]]}}");
                 try
                 {
                     if (filter !=null && filter.length() > 0)
@@ -261,7 +262,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
             
         }
         
-        private String GetFilter(String filter) {
+        private String GetFilter(String filter) throws ParseException{
             StringBuilder sb = new StringBuilder();
             
             LinkedHashMap<String, Object> q = new LinkedHashMap<String, Object>();	    		    	
@@ -292,23 +293,55 @@ public class PlenarioDataProvider implements GenericRetrievable {
                                 else if(key_fil.equals("$lte")){   key_fil = "__le";   }
                                 else if(key_fil.equals("$ne")){   key_fil = "__ne";   }
                                 else if(key_fil.equals("$in")){   key_fil = "__in";   }
-
+                                else if(key_fil.equals("$regex")){   key_fil = "__ilike";   }
                                 sb.append("&"+key+key_fil+"=");
 
                                 if(key.toLowerCase().contains("date"))
                                 {
                                     DateFormat df = new SimpleDateFormat("yyyy-M-d");
-                                    sb.append(df.format(new Date((Long)entry_fil.getValue())));
+                                    
+                                    if (entry_fil.getValue().toString().contains("/"))
+                                    {
+                                        DateFormat df_in = new SimpleDateFormat("MM/dd/yyyy");
+                                        sb.append(df.format(df_in.parse(entry_fil.getValue().toString())));
+                                    }
+                                    else
+                                    {
+                                        sb.append(df.format(new Date((Long)entry_fil.getValue())));
+                                    }
                                 }
                                 else
                                 {
-                                    sb.append(entry_fil.getValue());
+                                    if(key_fil.equals("$regex"))
+                                    {
+                                        if(entry_fil.getValue().toString().contains("^"))
+                                        {
+                                            sb.append(entry_fil.getValue()).append("%");
+                                        }
+                                        else
+                                        {
+                                            sb.append("%").append(entry_fil.getValue()).append("%");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        sb.append(entry_fil.getValue());
+                                    }
+                                    
                                 }
                             }
                         }
                         else
                         {
-                            sb.append("&"+key+"=");
+                            //This is a Begins With Query
+                            if(q_filter_in.getValue().toString().contains("^"))
+                            {
+                                sb.append("&"+key+"__ilike=");
+                                sb.append(q_filter_in.getValue().toString().replace("^", "") + "%");
+                            }
+                            else
+                            {
+                                sb.append("&"+key+"=");
 
                                 if(key.toLowerCase().contains("date"))
                                 {
@@ -319,6 +352,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
                                 {
                                     sb.append(q_filter_in.getValue());
                                 }
+                            }
                         }
                         
                     }
@@ -427,7 +461,8 @@ public class PlenarioDataProvider implements GenericRetrievable {
         String defaultAttribution = properties.getStringProperty("plenario.attribution.default");
         String defaultDataset = properties.getStringProperty("plenario.dataset.default");
         
-        if(cityOnly && !(jsonObject.get("attribution").toString().contains(defaultAttribution) || jsonObject.get("dataset_name").toString().contains(defaultDataset)))
+        if( cityOnly && !(jsonObject.get("attribution").toString().contains(defaultAttribution) 
+                || jsonObject.get("dataset_name").toString().contains(defaultDataset)) || IgnoreDataset(jsonObject.get("dataset_name").toString().replace("\"", "")))
         {
             return null;
         }
@@ -501,7 +536,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
                 column.setGroupBy(shouldColumnBeInGroupBy(object.get("field_name").toString().replace("\"", "")));
                 column.setQuickSearch(shouldColumnBeInQuickSearch(object.get("field_name").toString().replace("\"", "")));
                 
-                if(!object.get("field_name").toString().replace("\"", "").endsWith("_id"))
+                if(IgnoreColumn(object.get("field_name").toString().replace("\"", "")))
                 {
                     column.setList(true);
                     column.setSortOrder(count);
@@ -573,7 +608,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
         }
         else if(plenarioType.equals("INTEGER"))
         {
-            return "integer";
+            return "number";
         }
         else if(plenarioType.equals("DOUBLE PRECISION"))
         {
@@ -588,7 +623,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
     }
 
     private boolean shouldColumnBeInPopup(String columnName) {
-        if(columnName.endsWith("_id") || columnName.equals("latitude") || columnName.equals("longitude") 
+        if(IgnoreColumn(columnName) || columnName.equals("latitude") || columnName.equals("longitude") 
                 || columnName.equals("x_coordinate") || columnName.equals("y_coordinate"))
         {
             return false;
@@ -613,6 +648,39 @@ public class PlenarioDataProvider implements GenericRetrievable {
             return true;
         }
         
+        return false;
+    }
+
+    private boolean IgnoreDataset(String datasetName) {
+        LinkedHashMap<String, Object> q = new LinkedHashMap<String, Object>();	    		    	
+        q =  (LinkedHashMap<String, Object>) JSON.parse(FileUtil.getJsonFileContents("json/plenario_datasets_to_ignore.json"));
+        
+        for (Map.Entry<String, Object> entry : q.entrySet()) {
+                
+                BasicDBList q_list = new BasicDBList();	    		    	
+                q_list =  (BasicDBList) JSON.parse(entry.getValue().toString());
+                Iterator iter=q_list.iterator();
+                
+                while (iter.hasNext()) {
+                    LinkedHashMap<String, String> q_filter = new LinkedHashMap<String, String>();	    		    	
+                    q_filter =  (LinkedHashMap<String, String>) JSON.parse(((LinkedHashMap<String, String>)(iter.next())).toString());
+                    String q_filter_key = q_filter.get("id");
+                    if(q_filter_key.equals(datasetName))
+                    {
+                        return true;
+                    }
+                }
+        }
+        
+        return false;
+    }
+
+    private boolean IgnoreColumn(String columnName) {
+        if(columnName.endsWith("_id") || columnName.equals("start_date")
+                || columnName.equals("end_date") || columnName.equals("current_flag") || columnName.equals("dup_ver"))
+        {
+            return true;
+        }
         return false;
     }
 

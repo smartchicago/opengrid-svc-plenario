@@ -27,6 +27,7 @@ public class NoAuthTokenAuthenticationService implements TokenAuthenticationServ
 	public void addAuthentication(HttpServletResponse response, Authentication authentication) {
         final org.opengrid.security.impl.User user = (org.opengrid.security.impl.User) authentication.getDetails();
         response.addHeader(AUTH_HEADER_NAME, tokenHandler.createTokenForUser(user));
+        response.addHeader("Access-Control-Allow-Origin", "*");
     }
  
     public Authentication getAuthentication(HttpServletRequest request) {

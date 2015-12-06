@@ -10,6 +10,7 @@ import org.opengrid.exception.ServiceException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
 
 @Path("/")
 public interface OpenGridService {
