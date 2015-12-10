@@ -1,6 +1,7 @@
 package org.opengrid.security;
 
 import javax.annotation.Resource;
+import javax.ws.rs.HttpMethod;
 
 import org.opengrid.security.impl.NoAuthTokenAuthenticationService;
 import org.opengrid.util.PropertiesManager;
@@ -58,7 +59,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("**/*.html").permitAll()
                 .antMatchers("**/*.css").permitAll()
                 .antMatchers("**/*.js").permitAll()                
- 
+                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
                 // Allow anonymous login to auth and current resources
                 .antMatchers("/rest/users/token").permitAll()
                  
