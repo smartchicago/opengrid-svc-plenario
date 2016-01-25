@@ -14,7 +14,13 @@
 
 	<context:annotation-config />
 	<context:component-scan base-package="org.opengrid"></context:component-scan>
-
+        <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+                <property name="cacheManager" ref="ehcache"/>
+        </bean>
+        <bean id="ehcache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+                <property name="configLocation" value="/WEB-INF/ehcache.xml"/>
+                <property name="shared" value="true"/>
+        </bean>
 	<jaxrs:server id="openGridService" address="/rest">
 		<jaxrs:serviceBeans>
 			<ref bean="OpenGridServiceBean" />

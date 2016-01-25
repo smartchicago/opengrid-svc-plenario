@@ -16,6 +16,17 @@
 	<url-pattern>/*</url-pattern>
 	<dispatcher>REQUEST</dispatcher>
   </filter-mapping>
+  
+    <filter>
+        <filter-name>SimplePageCachingFilter</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+    </filter>
+    <!-- This is a filter chain. They are executed in the order below.
+    Do not change the order. -->
+    <filter-mapping>
+        <filter-name>SimplePageCachingFilter</filter-name>
+        <url-pattern>/rest/datasets</url-pattern>
+    </filter-mapping>
   <!-- CorsFilter -->
   <!--
 <filter>

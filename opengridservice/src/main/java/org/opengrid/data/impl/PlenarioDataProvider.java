@@ -55,8 +55,11 @@ public class PlenarioDataProvider implements GenericRetrievable {
             
                 StringBuilder sURL = new StringBuilder();
                 StringBuilder sb = new StringBuilder();
+                String defaultGeo = properties.getStringProperty("plenario.geo.default");
                 sURL.append("http://plenar.io/v1/api/detail/?dataset_name=" + dataSetId + "&dup_ver=1&obs_date__ge=2000-1-1"); //just a string
-                sURL.append("&location_geom__within={\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[-89.961548,42.561173],[-87.033691,42.561173],[-87.033691,39.609920],[-89.961548,39.609920],[-89.961548,42.561173]]]}}");
+                sURL.append("&location_geom__within={\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":"
+                        + defaultGeo
+                        + "}}");
                 try
                 {
                     if (filter !=null && filter.length() > 0)
@@ -536,7 +539,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
                 column.setGroupBy(shouldColumnBeInGroupBy(object.get("field_name").toString().replace("\"", "")));
                 column.setQuickSearch(shouldColumnBeInQuickSearch(object.get("field_name").toString().replace("\"", "")));
                 
-                if(IgnoreColumn(object.get("field_name").toString().replace("\"", "")))
+                if(!IgnoreColumn(object.get("field_name").toString().replace("\"", "")))
                 {
                     column.setList(true);
                     column.setSortOrder(count);
