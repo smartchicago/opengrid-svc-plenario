@@ -724,6 +724,14 @@
 										"operator":"equal",
 										"type":"string",
 										"value":"Pass"
+									},
+                                                                        {
+										"field":"facility_type",
+										"id":"facility_type",
+										"input":"text",
+										"operator":"equal",
+										"type":"string",
+										"value":"Restaurant"
 									}
 								]
 						},

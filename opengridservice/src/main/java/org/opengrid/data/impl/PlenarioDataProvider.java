@@ -29,6 +29,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.util.JSON;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
@@ -265,7 +266,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
             
         }
         
-        private String GetFilter(String filter) throws ParseException{
+        private String GetFilter(String filter) throws ParseException, UnsupportedEncodingException{
             StringBuilder sb = new StringBuilder();
             
             LinkedHashMap<String, Object> q = new LinkedHashMap<String, Object>();	    		    	
@@ -364,7 +365,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
             }
             
             
-            return sb.toString();
+            return sb.toString().replace(" ", "%20");
         }
 
     private String getFeatures(JsonArray jsonArray, OpenGridDataset desc) 

@@ -36,6 +36,25 @@ public class PlenarioSearchTest {
 	public static void cleanupTest() {
 	}
 	
+        @Test
+	public void t1a_SearchDatasetID() {
+		GenericRetrievable gr = new PlenarioDataProvider();
+		try {
+			String a = gr.getData("food_inspections", 
+					"", 
+					"{\"$and\":[{\"facility_type\":\"GAS STATION\"}]}", //filter
+					6000,
+					null);
+                        
+                        com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
+                        JsonElement object = parser.parse(a);
+                        
+			assertTrue("Result cannot be null", a !=null);
+		} catch (Exception ex) {
+			assertTrue("Unexpected exception message on bad dataset ID", ex.getMessage().indexOf("Cannot find dataset descriptor") > -1);
+		}
+	}
+        
 	@Test
 	public void t1_GetAllDatasetIds() {
 		
