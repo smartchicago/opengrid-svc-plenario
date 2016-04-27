@@ -1,11 +1,26 @@
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="../../main/config/ehcache.xsd">
-    <cache name="SimplePageCachingFilter"
+         xsi:noNamespaceSchemaLocation="../../main/config/ehcache.xsd">
+    <!--<cache name="SimplePageCachingFilter"
         maxEntriesLocalHeap="10000"
         maxEntriesLocalDisk="1000"
         eternal="false"
         overflowToDisk="true"
         timeToLiveSeconds="43200"
         memoryStoreEvictionPolicy="LFU"
-    />
+    >
+        <cacheWriter writeMode="write-behind" minWriteDelay="1" maxWriteDelay="1000"
+                     rateLimitPerSecond="5" writeCoalescing="true" writeBatching="true" writeBatchSize="1"
+                     retryAttempts="5" retryAttemptDelaySeconds="5" />
+    </cache>
+
+</ehcache>-->
+    <cache name="org.opengrid.service.impl.OpenGridPlenarioService.datasets"
+           maxEntriesLocalHeap="10000"
+           maxEntriesLocalDisk="1000"
+           eternal="false"
+           overflowToDisk="true"
+           timeToLiveSeconds="43200"
+           memoryStoreEvictionPolicy="LFU"
+    >
+    </cache>
 </ehcache>

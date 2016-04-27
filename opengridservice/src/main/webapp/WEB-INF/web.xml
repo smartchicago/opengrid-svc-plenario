@@ -5,28 +5,32 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>/WEB-INF/application-context.xml</param-value>
   </context-param>
-  
+
   <filter>
-	<filter-name>springSecurityFilterChain</filter-name>
-	<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
   </filter>
-	 
+
   <filter-mapping>
-	<filter-name>springSecurityFilterChain</filter-name>
-	<url-pattern>/*</url-pattern>
-	<dispatcher>REQUEST</dispatcher>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
-  
-    <filter>
-        <filter-name>SimplePageCachingFilter</filter-name>
-        <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
-    </filter>
-    <!-- This is a filter chain. They are executed in the order below.
-    Do not change the order. -->
-    <filter-mapping>
-        <filter-name>SimplePageCachingFilter</filter-name>
-        <url-pattern>/rest/datasets</url-pattern>
-    </filter-mapping>
+
+  <!--<filter>
+      <filter-name>SimplePageCachingFilter</filter-name>
+      <filter-class>net.sf.ehcache.constructs.web.filter.SimplePageCachingFilter</filter-class>
+      <init-param>
+          <param-name>blockingTimeoutMillis</param-name>
+          <param-value>10000</param-value>
+      </init-param>
+  </filter>. -->
+  <!-- This is a filter chain. They are executed in the order below.
+  Do not change the order. -->
+  <!--<filter-mapping>
+      <filter-name>SimplePageCachingFilter</filter-name>
+      <url-pattern>/rest/datasets</url-pattern>
+  </filter-mapping>. -->
   <!-- CorsFilter -->
   <!--
 <filter>

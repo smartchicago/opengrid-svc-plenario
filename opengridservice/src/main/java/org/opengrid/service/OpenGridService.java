@@ -10,82 +10,81 @@ import org.opengrid.exception.ServiceException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import org.apache.cxf.rs.security.cors.CrossOriginResourceSharing;
 
 @Path("/")
 public interface OpenGridService {
-	
+
 	//authentication resource
-	@POST 
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/users/token")
 	public void getOpenGridUserToken(final String payLoad);
-	
+
 	//reads existing token from request header and renews expiry time
 	@POST
 	@Path("/users/renew")
 	public void refreshOpenGridUserToken(@Context MessageContext mc);
-		
+
 	//lists all datasets and descriptors
-	@GET 
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/datasets")
 	public String getOpenGridDatasetList(@Context MessageContext mc) throws JsonParseException, JsonMappingException, ServiceException, IOException;
 
-	
+
 	//returns descriptor for a specific dataset
-	@GET 
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/datasets/{datasetId}")
 	public String getOpenGridDataset(@PathParam("datasetId") final String datasetId) throws JsonParseException, JsonMappingException, ServiceException, IOException;
-	
-	
-		
+
+
+
 	//executes query against one dataset/data type
-	@GET 
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/datasets/{datasetId}/query")
-	public String executeOpenGridQueryWithParams(@PathParam("datasetId") final String datasetId, 
+	public String executeOpenGridQueryWithParams(@PathParam("datasetId") final String datasetId,
 												@QueryParam("q") final String filter,
 												@QueryParam("n") final int max,
 												@QueryParam("s") final String sort
 												);
-	
+
 	//lists queries meeting specified filter
-	@GET 
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/queries")
 	public String getOpenGridQueriesList(@QueryParam("q") final String filter,
 										@QueryParam("n") final int max,
 										@QueryParam("s") final String sort);
-	
-	
+
+
 	//updates an existing query
-	@PUT 
+	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/queries/{queryId}")
 	public String updateOpenGridQuery(@PathParam("queryId") final String queryId,
 												final String payLoad);
-		
+
 
 	//inserts new query, returns new object with id attribute
-	@POST 
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/queries")
 	public String addOpenGridNewQuery(final String payLoad);
 
-	
+
 	//deletes query
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/queries/{queryId}")
 	public void deleteOpenGridQuery(@PathParam("queryId") final String queryId);
-	
+
 
 	//lists all users meeting given criteria
-	@GET 
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/users")
 	public String getOpenGridUsersList(@QueryParam("q") final String filter,
@@ -98,18 +97,18 @@ public interface OpenGridService {
 	@Path("/queries/{queryId}")
 	public String getOpenGridQuery(@PathParam("queryId") final String queryId);
 
-	
+
 
 	//inserts new user, returns new object with id attribute
-	@POST 
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/users")
 	public String addOpenGridNewUser(final String payLoad);
-		
-	
+
+
 	//updates an existing user
-	@PUT 
+	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/users/{userId}")
@@ -126,11 +125,11 @@ public interface OpenGridService {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/users/{userId}")
-	public void deleteOpenGridUser(@PathParam("userId") final String userId);	
-	
+	public void deleteOpenGridUser(@PathParam("userId") final String userId);
+
 
 	//lists all groups meeting given criteria
-	@GET 
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/groups")
 	public String getOpenGridGroupsList(@QueryParam("q") final String filter,
@@ -146,15 +145,15 @@ public interface OpenGridService {
 
 
 	//inserts new group, returns new object with id attribute
-	@POST 
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/groups")
 	public String addOpenGridNewGroup(final String payLoad);
-		
-	
+
+
 	//updates an existing group
-	@PUT 
+	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/groups/{groupId}")
@@ -166,5 +165,7 @@ public interface OpenGridService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/groups/{groupId}")
 	public void deleteOpenGridGroup(@PathParam("groupId") final String groupId);
+
+    public static final String DATASETS_CHACHE_KEY = "DATASETS";
 	
 }
