@@ -850,7 +850,7 @@
 			{
 				"boundary":"_me",
 				"boundaryType":"near",
-				"maxRadius":"0.250",
+				"maxRadius":"0.25",
 				"maxRadiusUnit":"miles",
 				"value":null
 			},

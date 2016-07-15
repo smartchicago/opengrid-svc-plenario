@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import javax.ws.rs.core.Response;
+import org.opengrid.data.ServiceCapabilities;
 
 @Component("OpenGridServiceBean_Test")
 public class OpenGridMongoService implements OpenGridService {
@@ -93,13 +95,14 @@ public class OpenGridMongoService implements OpenGridService {
 
 
 	@Override
-	public String executeOpenGridQueryWithParams(String datasetId, String filter, int max, String sort) {
+	public String executeOpenGridQueryWithParams(String datasetId, String filter, int max, String sort, String options) {
 		return omniDataProvider.getData(
 				datasetId,
 				ServiceProperties.getProperties().getStringProperty("mongo.metaCollectionName"), 
 				filter, 
 				max,
-				sort);
+				sort,
+                                options);
 	}
 
 
@@ -211,5 +214,15 @@ public class OpenGridMongoService implements OpenGridService {
 		tokenAuthService.setKey(ServiceProperties.getProperties().getStringProperty("auth.key"));
 		tokenAuthService.renewAuthentication(mc.getHttpServletRequest(), mc.getHttpServletResponse());
 	}		
+
+    @Override
+    public ServiceCapabilities getServiceCapabilities() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Response options() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
 }

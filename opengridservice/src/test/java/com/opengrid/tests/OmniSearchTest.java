@@ -43,7 +43,8 @@ public class OmniSearchTest {
 				"opengrid_badzzz", 
 				"{}", //filter
 				20,
-				null);
+				null,
+                                        null);
 			assertTrue("An exception on non-existent collection is expected", false);
 		} catch (Exception ex) {
 			assertTrue("Unexpected exception message on bad meta collection", ex.getMessage().indexOf("Cannot find 'datasets' document") > -1);
@@ -54,7 +55,8 @@ public class OmniSearchTest {
 				"opengrid_data", 
 				"{}", //filter
 				20,
-				null);
+				null,
+                                        null);
 			assertTrue("An exception on wrong collection is expected", false);
 		} catch (Exception ex) {
 			assertTrue("Unexpected exception message on bad meta collection", ex.getMessage().indexOf("Cannot find 'datasets' document") > -1);
@@ -64,7 +66,8 @@ public class OmniSearchTest {
 				"opengrid_meta", 
 				"{}", //filter
 				20,
-				null);
+				null,
+                                null);
 		System.out.println(rs);
 		assertTrue("Result cannot be null", rs !=null);
 	}
@@ -77,7 +80,8 @@ public class OmniSearchTest {
 					"opengrid_meta", 
 					"{}", //filter
 					20,
-					null);
+					null,
+                                        null);
 			assertTrue("An exception on bad dataset id is expected", false);
 		} catch (Exception ex) {
 			assertTrue("Unexpected exception message on bad dataset ID", ex.getMessage().indexOf("Cannot find dataset descriptor") > -1);
@@ -91,7 +95,8 @@ public class OmniSearchTest {
 				"opengrid_meta", 
 				"{\"$and\":[{\"text\":{\"$regex\":\"coupon\"}}]}", //filter
 				20,
-				null);		
+				null,
+                                        null);		
 		assertTrue("result set is returned with no error", !rs.isEmpty());
 	}
 	
@@ -102,7 +107,8 @@ public class OmniSearchTest {
 				"opengrid_meta", 
 				"{\"$and\":[{\"what.account_number\":{\"$eq\":\"329961\"}}]}", //filter
 				20,
-				null);		
+				null,
+                                        null);	
 		assertTrue("result set is returned with no error", !rs.isEmpty());
 	}
 }

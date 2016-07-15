@@ -40,11 +40,12 @@ public class PlenarioSearchTest {
 	public void t1a_SearchDatasetID() {
 		GenericRetrievable gr = new PlenarioDataProvider();
 		try {
-			String a = gr.getData("food_inspections", 
+			String a = gr.getData("cdph_environmental_inspections", 
 					"", 
-					"{\"$and\":[{\"facility_type\":\"GAS STATION\"}]}", //filter
+					"{}", //filter
 					6000,
-					null);
+					null,
+                                        null);
                         
                         com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
                         JsonElement object = parser.parse(a);
@@ -70,7 +71,7 @@ public class PlenarioSearchTest {
 		
 	}
 	
-	@Test
+	//@Test
 	public void t2_SearchDatasetID() {
 		GenericRetrievable gr = new PlenarioDataProvider();
 		try {
@@ -78,7 +79,8 @@ public class PlenarioSearchTest {
 					"", 
 					"{\"$and\":[{\"start_date\":{\"$gte\":1447653600000}}]}", //filter
 					6000,
-					null);
+					null,
+                                        null);
                         
                         com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
                         JsonElement object = parser.parse(a);
@@ -136,7 +138,8 @@ public class PlenarioSearchTest {
 					"", 
 					"{\"$and\":[{\"zip\":60601},{\"start_date\":{\"$gte\":1438405200000}}]}", //filter
 					6000,
-					null);
+					null,
+                                        null);
                         
                         com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
                         JsonElement object = parser.parse(a);
@@ -147,7 +150,7 @@ public class PlenarioSearchTest {
 		}
 	}
         
-        @Test
+        //@Test
 	public void t6_SearchDatasetID() {
 		GenericRetrievable gr = new PlenarioDataProvider();
 		try {
@@ -155,7 +158,8 @@ public class PlenarioSearchTest {
 					"", 
 					"{\"$and\":[{\"start_date\":{\"$gte\":\"12/01/2015\",\"$lte\":\"12/03/2015\"}}]}", //filter
 					6000,
-					null);
+					null,
+                                        null);
                         
                         com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
                         JsonElement object = parser.parse(a);
@@ -174,7 +178,8 @@ public class PlenarioSearchTest {
 					"", 
 					"{\"$and\":[{\"service_request_number\":{\"$regex\":\"^6\"}}]}", //filter
 					6000,
-					null);
+					null,
+                                        null);
                         
                         com.google.gson.JsonParser parser = new com.google.gson.JsonParser();
                         JsonElement object = parser.parse(a);

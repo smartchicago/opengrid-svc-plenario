@@ -29,7 +29,7 @@ import com.mongodb.util.JSON;
 public class OmniMongoDataProvider implements GenericRetrievable {
 
 	@Override
-	public String getData(String dataSetId, String metaCollectionName, String filter, int max, String sort) throws ServiceException {		
+	public String getData(String dataSetId, String metaCollectionName, String filter, int max, String options, String sort) throws ServiceException {		
 		MongoDBHelper ds = null;
 		MongoDatabase db = null;
 				

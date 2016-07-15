@@ -9,7 +9,6 @@ import java.util.List;
 import org.bson.Document;
 import org.opengrid.constants.Exceptions;
 import org.opengrid.data.GenericRetrievable;
-import org.opengrid.data.MongoDBHelper;
 import org.opengrid.data.meta.OpenGridColumn;
 import org.opengrid.data.meta.OpenGridDataset;
 import org.opengrid.data.meta.OpenGridMeta;
@@ -17,11 +16,8 @@ import org.opengrid.exception.ServiceException;
 import org.opengrid.util.ExceptionUtil;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mongodb.BasicDBList;
@@ -34,40 +30,47 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.annotation.Resource;
 import org.opengrid.data.meta.DatasetOptions;
 import org.opengrid.data.meta.QuickSearch;
 import org.opengrid.data.meta.Rendition;
 import org.opengrid.util.FileUtil;
-import static org.opengrid.util.JSONUtil.isJSONValid;
 import org.opengrid.util.PropertiesManager;
 import org.opengrid.util.ServiceProperties;
 
 public class PlenarioDataProvider implements GenericRetrievable {
+    
+        Logger log = Logger.getLogger(PlenarioDataProvider.class.getName());
+        
         protected PropertiesManager properties = ServiceProperties.getProperties();
+        
 
 	@Override
-	public String getData(String dataSetId, String metaCollectionName, String filter, int max, String sort) throws ServiceException {		
+	public String getData(String dataSetId, String metaCollectionName, String filter, int max, String sort, String options) throws ServiceException {		
 			    	
             
                 StringBuilder sURL = new StringBuilder();
                 StringBuilder sb = new StringBuilder();
-                String defaultGeo = properties.getStringProperty("plenario.geo.default");
+                
                 sURL.append("http://plenar.io/v1/api/detail/?dataset_name=" + dataSetId + "&dup_ver=1&obs_date__ge=2000-1-1"); //just a string
-                sURL.append("&location_geom__within={\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":"
-                        + defaultGeo
-                        + "}}");
+                
                 try
                 {
+                    
+                    sURL.append(getGeoFilter(options));
+                    
                     if (filter !=null && filter.length() > 0)
                     {
                         sURL.append(GetFilter(filter));
                     }
-
+                    
+                    //System.out.println("final string" + sURL.toString());
+                    
                     OpenGridDataset desc = this.getDescriptorInternal(metaCollectionName, dataSetId, false);
                     
                     com.google.gson.JsonObject rootobj = getJsonObjectFromURL(sURL.toString());
@@ -367,6 +370,32 @@ public class PlenarioDataProvider implements GenericRetrievable {
             
             return sb.toString().replace(" ", "%20");
         }
+        
+    private String getGeoFilter(String options) throws ParseException, UnsupportedEncodingException{
+        String geoType = "Polygon";
+        //String geoCoordinates = properties.getStringProperty("plenario.geo.default");    
+         
+        String geoCoordinates = properties.getStringProperty("plenario.geo.default");
+        
+        if (options !=null && options.length() > 0) {
+            BasicDBObject o =  (BasicDBObject) JSON.parse(options);
+
+            if (o.containsField("geoFilter")) {
+                BasicDBObject qo =   (BasicDBObject) o.get("geoFilter");
+                
+                geoType = (String)qo.get("type");
+
+                BasicDBList coordinatesList =   (BasicDBList) qo.get("coordinates");
+
+                geoCoordinates = coordinatesList.toString().replace(" ", "%20");
+
+            } 
+        }
+
+        return "&location_geom__within={\"type\":\"Feature\",\"properties\":{},\"geometry\":{\"type\":\"" + geoType + "\",\"coordinates\":"
+                    + geoCoordinates
+                    + "}}";
+    }
 
     private String getFeatures(JsonArray jsonArray, OpenGridDataset desc) 
             throws ServiceException, JsonParseException, JsonMappingException, IOException{
@@ -432,10 +461,13 @@ public class PlenarioDataProvider implements GenericRetrievable {
             List<OpenGridDataset> openGridDatasets = new ArrayList<OpenGridDataset>();
             
             Iterator itr = objects.iterator();
-        
+            
+            String defaultAttribution = properties.getStringProperty("plenario.attribution.default");
+            String defaultDataset = properties.getStringProperty("plenario.dataset.default");
+
             while(itr.hasNext())
             {
-                OpenGridDataset dataset = getOpenGridDatasetFromPlenarioObject((JsonObject)itr.next(), includeColumns, cityOnly);
+                OpenGridDataset dataset = getOpenGridDatasetFromPlenarioObject(defaultAttribution, defaultDataset, (JsonObject)itr.next(), includeColumns, cityOnly);
                 if(dataset != null)
                 {
                     openGridDatasets.add(dataset);
@@ -457,13 +489,11 @@ public class PlenarioDataProvider implements GenericRetrievable {
 
     }
     
-    private OpenGridDataset getOpenGridDatasetFromPlenarioObject(JsonObject jsonObject, boolean needColumns, boolean cityOnly) 
+    private OpenGridDataset getOpenGridDatasetFromPlenarioObject(String defaultAttribution, String defaultDataset, JsonObject jsonObject, boolean needColumns, boolean cityOnly) 
     throws ServiceException, JsonParseException, JsonMappingException, IOException
     {
         OpenGridDataset dataset = new OpenGridDataset();
         QuickSearch qs = new QuickSearch();
-        String defaultAttribution = properties.getStringProperty("plenario.attribution.default");
-        String defaultDataset = properties.getStringProperty("plenario.dataset.default");
         
         if( cityOnly && !(jsonObject.get("attribution").toString().contains(defaultAttribution) 
                 || jsonObject.get("dataset_name").toString().contains(defaultDataset)) || IgnoreDataset(jsonObject.get("dataset_name").toString().replace("\"", "")))
@@ -582,6 +612,9 @@ public class PlenarioDataProvider implements GenericRetrievable {
             JsonArray objects = (JsonArray)datasets.get("objects");
             
             Iterator itr = objects.iterator();
+            
+            String defaultAttribution = properties.getStringProperty("plenario.attribution.default");
+            String defaultDataset = properties.getStringProperty("plenario.dataset.default");
         
             while(itr.hasNext())
             {
@@ -590,7 +623,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
                 
                 if(datasetName.equals(datasetId))
                 {
-                    dataset = getOpenGridDatasetFromPlenarioObject(object, true, false);
+                    dataset = getOpenGridDatasetFromPlenarioObject(defaultAttribution, defaultDataset, object, true, false);
                     break;
                 }
                 
@@ -687,5 +720,5 @@ public class PlenarioDataProvider implements GenericRetrievable {
         }
         return false;
     }
-
+    
 }

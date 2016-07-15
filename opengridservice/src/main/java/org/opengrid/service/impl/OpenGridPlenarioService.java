@@ -20,8 +20,11 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import javax.ws.rs.core.Response;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
 import org.opengrid.cache.CacheService;
+import org.opengrid.data.ServiceCapabilities;
 import org.opengrid.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -96,13 +99,14 @@ public class OpenGridPlenarioService implements OpenGridService {
 
 
     @Override
-    public String executeOpenGridQueryWithParams(String datasetId, String filter, int max, String sort) {
+    public String executeOpenGridQueryWithParams(String datasetId, String filter, int max, String sort, String options) {
             return omniDataProvider.getData(
                             datasetId,
                             ServiceProperties.getProperties().getStringProperty("mongo.metaCollectionName"),
                             filter,
                             max,
-                            sort);
+                            sort,
+                            options);
     }
 
 
@@ -240,6 +244,26 @@ public class OpenGridPlenarioService implements OpenGridService {
      */
     public void setCacheService(CacheService cacheService) {
             this.cacheService = cacheService;
+    }
+    
+    @Override
+    public ServiceCapabilities getServiceCapabilities() {
+            //customize this depending on what this service implementation support
+            ServiceCapabilities sc = new ServiceCapabilities();
+
+            sc.setGeoSpatialFiltering(true);
+            return sc;
+    }
+    
+        @Override
+    public Response options() {
+        return Response.ok()
+                    .header(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS, "origin, content-type, accept, authorization, X-AUTH-TOKEN")
+                    .header(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+           //.header(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, "false")
+           //.header(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, "*")
+           .header(CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS, "X-AUTH-TOKEN")
+           .build();       
     }
 
 }
