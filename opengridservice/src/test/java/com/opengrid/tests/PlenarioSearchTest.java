@@ -36,7 +36,7 @@ public class PlenarioSearchTest {
 	public static void cleanupTest() {
 	}
 	
-        @Test
+        //@Test
 	public void t1a_SearchDatasetID() {
 		GenericRetrievable gr = new PlenarioDataProvider();
 		try {
@@ -77,7 +77,7 @@ public class PlenarioSearchTest {
 		try {
 			String a = gr.getData("311_service_requests_alley_lights_out", 
 					"", 
-					"{\"$and\":[{\"start_date\":{\"$gte\":1447653600000}}]}", //filter
+					"{\"$and\":[{\"creation_date\":{\"$gte\":1468463580000}}]}", //filter
 					6000,
 					null,
                                         null);
@@ -130,7 +130,7 @@ public class PlenarioSearchTest {
                 }
 	}
         
-        @Test
+        //@Test
 	public void t5_SearchDatasetID() {
 		GenericRetrievable gr = new PlenarioDataProvider();
 		try {

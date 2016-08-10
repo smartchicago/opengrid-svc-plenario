@@ -18,6 +18,7 @@ import org.opengrid.util.ExceptionUtil;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mongodb.BasicDBList;
@@ -57,7 +58,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
                 StringBuilder sURL = new StringBuilder();
                 StringBuilder sb = new StringBuilder();
                 
-                sURL.append("http://plenar.io/v1/api/detail/?dataset_name=" + dataSetId + "&dup_ver=1&obs_date__ge=2000-1-1"); //just a string
+                sURL.append("http://plenar.io/v1/api/detail/?dataset_name=" + dataSetId + "&dup_ver=1&obs_date__ge=2000-1-1&data_type=geojson"); //just a string
                 
                 try
                 {
@@ -74,7 +75,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
                     OpenGridDataset desc = this.getDescriptorInternal(metaCollectionName, dataSetId, false);
                     
                     com.google.gson.JsonObject rootobj = getJsonObjectFromURL(sURL.toString());
-                    JsonArray jsonArray = (JsonArray)rootobj.get("objects");
+                    JsonArray jsonArray = (JsonArray)rootobj.get("features");
 
                     sb.append("{ \"type\" : \"FeatureCollection\", \"features\" : [");
                     sb.append(getFeatures(jsonArray, desc));
@@ -94,10 +95,11 @@ public class PlenarioDataProvider implements GenericRetrievable {
 	}
 
 	
-	private String getFeature(com.google.gson.JsonObject jsonElement, OpenGridDataset desc) {
+	private String getFeature(com.google.gson.JsonObject jsonElementMain, OpenGridDataset desc) {
 
 		String s = "{\"type\": \"Feature\", \"properties\": ";
-		
+		com.google.gson.JsonObject jsonElement = (com.google.gson.JsonObject)jsonElementMain.get("properties");
+                com.google.gson.JsonObject jsonElementGeo = (com.google.gson.JsonObject)jsonElementMain.get("geometry");
 		Document doc = new Document();
 		//iterate through available columns and build JSON		
 		for (OpenGridColumn c: desc.getColumns()) {
@@ -144,26 +146,24 @@ public class PlenarioDataProvider implements GenericRetrievable {
                             }
 			}
 		}
-		s += doc.toJson();
 		
-		//build the coordinates in the geometry
-		//lat long are required attributes
-		if (!doc.containsKey(desc.getOptions().getLong())) {
+                
+                /*if (!doc.containsKey("Longitude")) {
 			//default longitude value
-			doc.put(desc.getOptions().getLong(), -1);
+			doc.put("Longitude", jsonElementGeo.get("coordinates").getAsJsonArray().get(0).toString());
 			//throw ExceptionUtil.getException(Exceptions.ERR_SERVICE, "Data is missing required '" +  desc.getOptions().getLong() + "' attribute for document " + doc.toJson());
-		}
+		}*/
 		
-		String lng = doc.get( desc.getOptions().getLong() ).toString();
+		String lng = jsonElementGeo.get("coordinates").getAsJsonArray().get(0).toString();
 		
-		if (!doc.containsKey(desc.getOptions().getLat())) {
+		/*if (!doc.containsKey("Latitude")) {
 			//throw ExceptionUtil.getException(Exceptions.ERR_SERVICE, "Data is missing required '" +  desc.getOptions().getLat() + "' attribute for document " + doc.toJson());
 			//default latitude value
-			doc.put(desc.getOptions().getLat(), -1);
-		}
-
-		String lat = doc.get (desc.getOptions().getLat() ).toString();
+			doc.put("Latitude", jsonElementGeo.get("coordinates").getAsJsonArray().get(1).toString());
+		}*/
 		
+		String lat = jsonElementGeo.get("coordinates").getAsJsonArray().get(1).toString();
+		s += doc.toJson();
 		s +=", \"geometry\": {\"type\": \"Point\", \"coordinates\": [" + lng + "," + lat + "]}, \"autoPopup\": false }";
 		return s;		
 	}
