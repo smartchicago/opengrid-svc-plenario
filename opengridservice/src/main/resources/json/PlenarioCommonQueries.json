@@ -692,7 +692,7 @@
 				"boundaryType":"within"
 			},
 		"isCommon":true,
-		"name":"Restaurants passing intial inspection",
+		"name":"Restaurants passing initial inspection",
 		"owner":"system",
 		"refreshInterval":"30",
 		"sharedWith":

@@ -62,12 +62,11 @@ public class PlenarioDataProvider implements GenericRetrievable {
                 
                 try
                 {
-                    
                     sURL.append(getGeoFilter(options));
                     
-                    if (filter !=null && filter.length() > 0)
-                    {
-                        sURL.append(GetFilter(filter));
+                    if (filter !=null && filter.length() > 0 && !filter.equals("{}"))
+                    {        
+                        sURL.append(BuildPlenarioFilter(dataSetId, filter));
                     }
                     
                     //System.out.println("final string" + sURL.toString());
@@ -274,103 +273,159 @@ public class PlenarioDataProvider implements GenericRetrievable {
             
             LinkedHashMap<String, Object> q = new LinkedHashMap<String, Object>();	    		    	
             q =  (LinkedHashMap<String, Object>) JSON.parse(filter);
+
             for (Map.Entry<String, Object> entry : q.entrySet()) {
                 
-                BasicDBList q_list = new BasicDBList();	    		    	
-                q_list =  (BasicDBList) JSON.parse(entry.getValue().toString());
-                Iterator iter=q_list.iterator();
-                
-                while (iter.hasNext()) {
-
-                    LinkedHashMap<String, Object> q_filter = new LinkedHashMap<String, Object>();	    		    	
-                    q_filter =  (LinkedHashMap<String, Object>) JSON.parse(((LinkedHashMap<String, Object>)(iter.next())).toString());
-
-                    for (Map.Entry<String, Object> q_filter_in : q_filter.entrySet()) {
-                        String key = q_filter_in.getKey();
-                        
-                        if(q_filter_in.getValue().toString().startsWith("{"))
-                        {
-                            for (Map.Entry<String, Object> entry_fil : ((LinkedHashMap<String, Object>)(JSON.parse(q_filter_in.getValue().toString()))).entrySet()) 
-                            {
-                                String key_fil = entry_fil.getKey();
-
-                                if(key_fil.equals("$gte")){   key_fil = "__ge";   }
-                                else if(key_fil.equals("$gt")){   key_fil = "__gt";   }
-                                else if(key_fil.equals("$lt")){   key_fil = "__lt";   }
-                                else if(key_fil.equals("$lte")){   key_fil = "__le";   }
-                                else if(key_fil.equals("$ne")){   key_fil = "__ne";   }
-                                else if(key_fil.equals("$in")){   key_fil = "__in";   }
-                                else if(key_fil.equals("$regex")){   key_fil = "__ilike";   }
-                                sb.append("&"+key+key_fil+"=");
-
-                                if(key.toLowerCase().contains("date"))
-                                {
-                                    DateFormat df = new SimpleDateFormat("yyyy-M-d");
-                                    
-                                    if (entry_fil.getValue().toString().contains("/"))
-                                    {
-                                        DateFormat df_in = new SimpleDateFormat("MM/dd/yyyy");
-                                        sb.append(df.format(df_in.parse(entry_fil.getValue().toString())));
-                                    }
-                                    else
-                                    {
-                                        sb.append(df.format(new Date((Long)entry_fil.getValue())));
-                                    }
-                                }
-                                else
-                                {
-                                    if(key_fil.equals("$regex"))
-                                    {
-                                        if(entry_fil.getValue().toString().contains("^"))
-                                        {
-                                            sb.append(entry_fil.getValue()).append("%");
-                                        }
-                                        else
-                                        {
-                                            sb.append("%").append(entry_fil.getValue()).append("%");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        sb.append(entry_fil.getValue());
-                                    }
-                                    
-                                }
-                            }
-                        }
-                        else
-                        {
-                            //This is a Begins With Query
-                            if(q_filter_in.getValue().toString().contains("^"))
-                            {
-                                sb.append("&"+key+"__ilike=");
-                                sb.append(q_filter_in.getValue().toString().replace("^", "") + "%");
-                            }
-                            else
-                            {
-                                sb.append("&"+key+"=");
-
-                                if(key.toLowerCase().contains("date"))
-                                {
-                                    DateFormat df = new SimpleDateFormat("yyyy-M-d");
-                                    sb.append(df.format(new Date((Long)q_filter_in.getValue())));
-                                }
-                                else
-                                {
-                                    sb.append(q_filter_in.getValue());
-                                }
-                            }
-                        }
-                        
-                    }
-                    // now work with key and value...
-                }
+                sb.append(getJsonFromFilterList(entry.getValue().toString(), q.keySet().toString()));
             }
-            
+
             
             return sb.toString().replace(" ", "%20");
         }
         
+    private String getJsonFromFilterList(String value, String key) throws ParseException, UnsupportedEncodingException
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        BasicDBList q_list = new BasicDBList();	    		    	
+        q_list =  (BasicDBList) JSON.parse(value);
+        Iterator iter=q_list.iterator();
+        
+        if (key.equals("[$and]") || key.equals("$and")) 
+                {sb.append("{\"op\": \"and\", \"val\": [");} 
+            else
+                {sb.append("{\"op\": \"or\", \"val\": [");} 
+
+        while (iter.hasNext()) {
+    //{\"$and\":[{\"current_activity\":\"1\"},{\"police_district\":2},{\"$and\":[{\"current_activity\":\"1\"},{\"creation_date\":{\"$gt\":1474651260000}}]}]}
+            LinkedHashMap<String, Object> q_filter = new LinkedHashMap<String, Object>();	    		    	
+            q_filter =  (LinkedHashMap<String, Object>) JSON.parse(((LinkedHashMap<String, Object>)(iter.next())).toString());
+
+            sb.append(getSingleFilter(q_filter));
+
+            if(iter.hasNext())
+            {
+                sb.append(",");
+            }
+        }
+        
+        sb.append("]}");
+        
+        return sb.toString();
+    }
+        
+        
+    private String getSingleFilter(LinkedHashMap<String, Object> q_filter) throws ParseException, UnsupportedEncodingException
+    {
+        StringBuilder sb = new StringBuilder();
+        
+        for (Map.Entry<String, Object> q_filter_in : q_filter.entrySet()) {
+            String keyIn = q_filter_in.getKey();
+            if(keyIn.equals("$and") || keyIn.equals("$or"))
+            {
+                sb.append(getJsonFromFilterList(q_filter_in.getValue().toString(),keyIn));
+            }
+            else if(q_filter_in.getValue().toString().startsWith("{"))
+            {
+                int innerCount = 0;
+                for (Map.Entry<String, Object> entry_fil : ((LinkedHashMap<String, Object>)(JSON.parse(q_filter_in.getValue().toString()))).entrySet()) 
+                {
+                    String key_fil = entry_fil.getKey();
+                    if (innerCount > 0)
+                        sb.append(",");
+
+                    if(key_fil.equals("$gte")){   key_fil = "ge";   }
+                    else if(key_fil.equals("$gt")){   key_fil = "gt";   }
+                    else if(key_fil.equals("$lt")){   key_fil = "lt";   }
+                    else if(key_fil.equals("$lte")){   key_fil = "le";   }
+                    else if(key_fil.equals("$ne")){   key_fil = "ne";   }
+                    else if(key_fil.equals("$in")){   key_fil = "in";   }
+                    else if(key_fil.equals("$regex")){   key_fil = "ilike";   }
+                    
+                    sb.append("{\"op\": \""+key_fil+"\", \"col\": \"");
+                    sb.append(keyIn+"\", \"val\": \"");
+
+                    if(keyIn.toLowerCase().contains("date"))
+                    {
+                        DateFormat df = new SimpleDateFormat("yyyy-M-d");
+
+                        if (entry_fil.getValue().toString().contains("/"))
+                        {
+                            DateFormat df_in = new SimpleDateFormat("MM/dd/yyyy");
+                            sb.append(df.format(df_in.parse(entry_fil.getValue().toString())));
+                        }
+                        else
+                        {
+                            sb.append(df.format(new Date((Long)entry_fil.getValue())));
+                        }
+                    }
+                    else
+                    {
+                        if(key_fil.equals("$regex"))
+                        {
+                            if(entry_fil.getValue().toString().contains("^"))
+                            {
+                                sb.append(entry_fil.getValue()).append("%");
+                            }
+                            else
+                            {
+                                sb.append("%").append(entry_fil.getValue()).append("%");
+                            }
+                        }
+                        else if(key_fil.equals("in"))
+                        {
+                            sb.append(((BasicDBList) entry_fil.getValue()).get(0).toString());
+                        }
+                        else
+                        {
+                            sb.append(entry_fil.getValue());
+                        }
+                    }
+                    
+                    sb.append("\"}");
+                    innerCount++;
+                }
+            }
+            else
+            {
+                //This is a Begins With Query
+                if(q_filter_in.getValue().toString().contains("^"))
+                {
+                    sb.append("{\"op\": \"ilike\", \"col\": \"");
+                    sb.append(keyIn+"\", \"val\": \"");
+
+                    sb.append(q_filter_in.getValue().toString().replace("^", "") + "%");
+                    sb.append("\"}");
+                }
+                else if(q_filter_in.getValue().toString().contains("$"))
+                {
+                    sb.append("{\"op\": \"ilike\", \"col\": \"");
+                    sb.append(keyIn+"\", \"val\": \"%");
+
+                    sb.append(q_filter_in.getValue().toString().replace("$", ""));
+                    sb.append("\"}");
+                }
+                else
+                {
+                    sb.append("{\"op\": \"eq\", \"col\": \"");
+                    sb.append(keyIn+"\", \"val\": \"");
+
+                    if(keyIn.toLowerCase().contains("date"))
+                    {
+                        DateFormat df = new SimpleDateFormat("yyyy-M-d");
+                        sb.append(df.format(new Date((Long)q_filter_in.getValue())));
+                    }
+                    else
+                    {
+                        sb.append(q_filter_in.getValue());
+                    }
+                    sb.append("\"}");
+                }
+            }
+        }
+        return sb.toString();
+    }
+    
     private String getGeoFilter(String options) throws ParseException, UnsupportedEncodingException{
         String geoType = "Polygon";
         //String geoCoordinates = properties.getStringProperty("plenario.geo.default");    
@@ -719,6 +774,17 @@ public class PlenarioDataProvider implements GenericRetrievable {
             return true;
         }
         return false;
+    }
+
+    private String BuildPlenarioFilter(String datasetId, String filter) throws ParseException, UnsupportedEncodingException {
+        StringBuilder filterString = new StringBuilder();
+        
+        filterString.append("&"+datasetId);
+        filterString.append("__filter=");
+       
+        filterString.append(GetFilter(filter));
+        
+        return filterString.toString();
     }
     
 }
