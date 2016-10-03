@@ -40,6 +40,7 @@ import javax.annotation.Resource;
 import org.opengrid.data.meta.DatasetOptions;
 import org.opengrid.data.meta.QuickSearch;
 import org.opengrid.data.meta.Rendition;
+import org.opengrid.util.ColorUtil;
 import org.opengrid.util.FileUtil;
 import org.opengrid.util.PropertiesManager;
 import org.opengrid.util.ServiceProperties;
@@ -561,13 +562,14 @@ public class PlenarioDataProvider implements GenericRetrievable {
         
         DatasetOptions options = new DatasetOptions();
         options.setLatLong("latitude,longitude");
+        String color = ColorUtil.GetRandomColor();
         
         Rendition rend = new Rendition();
-        rend.setColor("cyan");
-        rend.setFillColor("#f03");
+        rend.setColor(color);
+        rend.setFillColor(color);
         rend.setIcon("default");
         rend.setOpacity(80);
-        rend.setSize(10);        
+        rend.setSize(6);        
         options.setRendition(rend);
         
         qs.setEnable(true);
