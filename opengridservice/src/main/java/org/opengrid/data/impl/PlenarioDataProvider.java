@@ -53,7 +53,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
         
 
 	@Override
-	public String getData(String dataSetId, String metaCollectionName, String filter, int max, String sort, String options) throws ServiceException {		
+	public String getData(String dataSetId, OpenGridMeta metaCollection, String filter, int max, String sort, String options) throws ServiceException {		
 			    	
             
                 StringBuilder sURL = new StringBuilder();
@@ -72,7 +72,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
                     
                     //System.out.println("final string" + sURL.toString());
                     
-                    OpenGridDataset desc = this.getDescriptorInternal(metaCollectionName, dataSetId, false);
+                    OpenGridDataset desc = this.getDescriptorInternal(metaCollection, dataSetId, false);
                     
                     com.google.gson.JsonObject rootobj = getJsonObjectFromURL(sURL.toString());
                     JsonArray jsonArray = (JsonArray)rootobj.get("features");
@@ -80,7 +80,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
                     sb.append("{ \"type\" : \"FeatureCollection\", \"features\" : [");
                     sb.append(getFeatures(jsonArray, desc));
                     sb.append("],");
-                    sb.append(getMeta(metaCollectionName, dataSetId));
+                    sb.append(getMeta(metaCollection, dataSetId));
                     sb.append("}");
 	        
                 }
@@ -193,27 +193,32 @@ public class PlenarioDataProvider implements GenericRetrievable {
 	}
 
 
-	private String getMeta(String metaCollectionName, String dataSetId) throws JsonParseException, JsonMappingException, ServiceException, IOException {
+	private String getMeta(OpenGridMeta metaCollection, String dataSetId) throws JsonParseException, JsonMappingException, ServiceException, IOException {
 		//return default descriptor, can be overridden by user preferences later
 		//return "\"meta\": { \"view\": { \"id\": \"twitter\", \"displayName\": \"Twitter\", \"options\": { \"rendition\": { \"icon\":\"default\", \"color\": \"#001F7A\", \"fillColor\": \"#00FFFF\", \"opacity\":85, \"size\":6 } }, \"columns\": [ {\"id\":\"_id\", \"displayName\":\"ID\", \"dataType\":\"string\", \"filter\":false, \"popup\":false, \"list\":false}, {\"id\":\"date\", \"displayName\":\"Date\", \"dataType\":\"date\", \"filter\":true, \"popup\":true, \"list\":true, \"sortOrder\":1}, {\"id\":\"screenName\", \"displayName\":\"Screen Name\", \"dataType\":\"string\", \"filter\":true, \"popup\":true, \"list\":true, \"sortOrder\":2}, {\"id\":\"text\", \"displayName\":\"Text\", \"dataType\":\"string\", \"filter\":true, \"popup\":true, \"list\":true, \"sortOrder\":3}, {\"id\":\"city\", \"displayName\":\"City\", \"dataType\":\"string\", \"filter\":true, \"popup\":true, \"list\":true, \"sortOrder\":4}, {\"id\":\"bio\", \"displayName\":\"Bio\", \"dataType\":\"string\",\"sortOrder\":5}, {\"id\":\"hashtags\", \"displayName\":\"Hashtags\", \"dataType\":\"string\", \"sortOrder\":6}, {\"id\":\"lat\", \"displayName\":\"Latitude\", \"dataType\":\"float\", \"list\":true, \"sortOrder\":7}, {\"id\":\"long\", \"displayName\":\"Longitude\", \"dataType\":\"float\", \"list\":true, \"sortOrder\":8} ] } }";
-		return "\"meta\": { \"view\": " + getDescriptor(metaCollectionName, dataSetId).toString() + " }";
+		return "\"meta\": { \"view\": " + getDescriptor(metaCollection, dataSetId).toString() + " }";
 	}
 
 	
 	
 	@Override
-	public OpenGridDataset getDescriptor(String metaCollectionName, String dataSetId) throws ServiceException, JsonParseException, JsonMappingException, IOException {
-		return this.getDescriptorInternal(metaCollectionName, dataSetId, true);		
+	public OpenGridDataset getDescriptor(OpenGridMeta metaCollection, String dataSetId) throws ServiceException, JsonParseException, JsonMappingException, IOException {
+		return this.getDescriptorInternal(metaCollection, dataSetId, true);		
 	}
 
 	
 	
 	@Override
-	public OpenGridDataset getDescriptorInternal(String metaCollectionName, String dataSetId, boolean removePrivates) throws ServiceException, JsonParseException, JsonMappingException, IOException {
+	public OpenGridDataset getDescriptorInternal(OpenGridMeta metaCollection, String dataSetId, boolean removePrivates) throws ServiceException, JsonParseException, JsonMappingException, IOException {
 		
             JsonObject datasets = getPlenarioDatasetJson();
             
-            OpenGridDataset desc = getPlenarioDataset(datasets, dataSetId);
+            OpenGridDataset desc = getDatasetFromMeta(metaCollection, dataSetId);
+            
+            if(desc  == null)
+            {
+                desc = getPlenarioDataset(datasets, dataSetId);
+            }
 
             if (removePrivates) {
                     //nullify some private info
@@ -226,6 +231,21 @@ public class PlenarioDataProvider implements GenericRetrievable {
 
 	}
 
+        public OpenGridMeta getAllDatasts()
+        {
+            com.google.gson.JsonObject datasets = getPlenarioDatasetJson();
+            OpenGridMeta meta = new OpenGridMeta();
+            try{
+                meta = mapPlenarioToOpenGridMeta(datasets, true, true);
+            }
+            catch(Exception e)
+            {
+                String e_out = e.toString();
+
+            }
+
+            return meta;
+        }
 
 	@Override
 	public List<String> getAllDatasetIds(String metaCollectionName)
@@ -575,6 +595,18 @@ public class PlenarioDataProvider implements GenericRetrievable {
         qs.setEnable(true);
         qs.setTriggerWord(dataset.getId());
         qs.setTriggerAlias(dataset.getId());
+        
+        if(dataset.getId().equals("business_licenses")) 
+        {
+            qs.setHintExample("business_licenses 60601");
+            qs.setHintCaption("Business Licenses in 60601");
+        }
+        else if(dataset.getId().equals("food_inspections")) 
+        {
+            qs.setHintExample("food_inspections 60601");
+            qs.setHintCaption("Food Inspections in 60601");
+        } 
+        
         dataset.setQuickSearch(qs);
         
         dataset.setOptions(options);
@@ -787,6 +819,19 @@ public class PlenarioDataProvider implements GenericRetrievable {
         filterString.append(GetFilter(filter));
         
         return filterString.toString();
+    }
+
+    private OpenGridDataset getDatasetFromMeta(OpenGridMeta metaCollection, String dataSetId) {
+        if(metaCollection != null)
+        {
+            for (OpenGridDataset s: metaCollection.getDatasets()) {
+                    if (s.getId().equals(dataSetId))
+                    {
+                        return s;
+                    }
+                }
+        }
+        return null;
     }
     
 }

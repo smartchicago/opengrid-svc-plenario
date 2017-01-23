@@ -98,7 +98,7 @@ public class OpenGridMongoService implements OpenGridService {
 	public String executeOpenGridQueryWithParams(String datasetId, String filter, int max, String sort, String options) {
 		return omniDataProvider.getData(
 				datasetId,
-				ServiceProperties.getProperties().getStringProperty("mongo.metaCollectionName"), 
+				null, 
 				filter, 
 				max,
 				sort,
@@ -109,7 +109,7 @@ public class OpenGridMongoService implements OpenGridService {
 	@Override
 	public String getOpenGridDataset(String datasetId) throws JsonParseException, JsonMappingException, ServiceException, IOException {
 		return omniDataProvider.getDescriptor(
-				ServiceProperties.getProperties().getStringProperty("mongo.metaCollectionName"),
+				null,
 				datasetId).toString();
 	}
 

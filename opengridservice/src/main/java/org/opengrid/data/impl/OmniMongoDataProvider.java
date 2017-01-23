@@ -28,7 +28,7 @@ import com.mongodb.util.JSON;
 
 public class OmniMongoDataProvider implements GenericRetrievable {
 
-	@Override
+	//@Override
 	public String getData(String dataSetId, String metaCollectionName, String filter, int max, String options, String sort) throws ServiceException {		
 		MongoDBHelper ds = null;
 		MongoDatabase db = null;
@@ -221,14 +221,14 @@ public class OmniMongoDataProvider implements GenericRetrievable {
 
 	
 	
-	@Override
+	//@Override
 	public OpenGridDataset getDescriptor(String metaCollectionName, String dataSetId) throws ServiceException, JsonParseException, JsonMappingException, IOException {
 		return this.getDescriptorInternal(metaCollectionName, dataSetId, true);		
 	}
 
 	
 	
-	@Override
+	//@Override
 	public OpenGridDataset getDescriptorInternal(String metaCollectionName, String dataSetId, boolean removePrivates) throws ServiceException, JsonParseException, JsonMappingException, IOException {
 		MongoDBHelper ds = new MongoDBHelper();
 				
@@ -288,4 +288,24 @@ public class OmniMongoDataProvider implements GenericRetrievable {
 			ds.closeConnection();
 		}
 	}
+
+    @Override
+    public OpenGridMeta getAllDatasts() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getData(String dataSetId, OpenGridMeta metaCollection, String filter, int max, String sort, String options) throws ServiceException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public OpenGridDataset getDescriptor(OpenGridMeta metaCollection, String dataSetId) throws ServiceException, JsonParseException, JsonMappingException, IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public OpenGridDataset getDescriptorInternal(OpenGridMeta metaCollection, String dataSetId, boolean removePrivates) throws ServiceException, JsonParseException, JsonMappingException, IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

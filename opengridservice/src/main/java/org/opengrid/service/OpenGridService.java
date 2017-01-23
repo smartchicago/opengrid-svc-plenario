@@ -190,5 +190,6 @@ public interface OpenGridService {
 	public Response options();
 
     public static final String DATASETS_CHACHE_KEY = "DATASETS";
+    public static final String DATASETS_META_CHACHE_KEY = "DATASETS_META";
 	
 }

@@ -25,6 +25,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.rs.security.cors.CorsHeaderConstants;
 import org.opengrid.cache.CacheService;
 import org.opengrid.data.ServiceCapabilities;
+import org.opengrid.data.meta.OpenGridDataset;
+import org.opengrid.data.meta.OpenGridMeta;
 import org.opengrid.util.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,6 +34,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 @Component("OpenGridServiceBean")
 public class OpenGridPlenarioService implements OpenGridService {
 
+    private OpenGridMeta cacheMetaData;
+    
     @Autowired
     @Qualifier("ehcacheServiceDatasets")
     private CacheService cacheService;
@@ -100,9 +104,18 @@ public class OpenGridPlenarioService implements OpenGridService {
 
     @Override
     public String executeOpenGridQueryWithParams(String datasetId, String filter, int max, String sort, String options) {
-            return omniDataProvider.getData(
+        OpenGridMeta meta = new OpenGridMeta();
+        if(cacheMetaData != null) {
+            meta = cacheMetaData;
+        }
+        else
+        {
+            meta = omniDataProvider.getAllDatasts();
+            cacheMetaData = meta;
+        }
+        return omniDataProvider.getData(
                             datasetId,
-                            ServiceProperties.getProperties().getStringProperty("mongo.metaCollectionName"),
+                            meta,
                             filter,
                             max,
                             sort,
@@ -112,8 +125,18 @@ public class OpenGridPlenarioService implements OpenGridService {
 
     @Override
     public String getOpenGridDataset(String datasetId) throws JsonParseException, JsonMappingException, ServiceException, IOException {
-            return omniDataProvider.getDescriptor(
-                            ServiceProperties.getProperties().getStringProperty("mongo.metaCollectionName"),
+        OpenGridMeta meta = new OpenGridMeta();
+        if(cacheMetaData != null) {
+            meta = cacheMetaData;
+        }
+        else
+        {
+            meta = omniDataProvider.getAllDatasts();
+            cacheMetaData = meta;
+        }
+        
+        return omniDataProvider.getDescriptor(
+                            meta,
                             datasetId).toString();
     }
 
@@ -128,20 +151,26 @@ public class OpenGridPlenarioService implements OpenGridService {
         h.setSecret(key);
         Claims c = h.getClaims(token);
         String descriptors = "";
+        OpenGridMeta meta = new OpenGridMeta();
 
-        List<String> ds = omniDataProvider.getAllDatasetIds(
-                        ServiceProperties.getProperties().getStringProperty("mongo.metaCollectionName")
-        );
-
+        if(cacheMetaData != null) {
+            meta = cacheMetaData;
+        }
+        else
+        {
+            meta = omniDataProvider.getAllDatasts();
+            cacheMetaData = meta;
+        }
+        
         if(cacheService.get(DATASETS_CHACHE_KEY) != null) {
             descriptors = (String)cacheService.get(DATASETS_CHACHE_KEY);
         }
         if(descriptors == null || descriptors.isEmpty()){
-            for (String s: ds) {
+            for (OpenGridDataset s: meta.getDatasets()) {
                 if (roleAccessValidator.lookupAccessMap("/rest/datasets/" + s, "GET", (String) c.get("resources"))) {
                         if (descriptors != null && !descriptors.isEmpty())
                                 descriptors += ", ";
-                        descriptors += this.getOpenGridDataset(s);
+                        descriptors += s.toString();
                 }
             }
             if(descriptors != null && !descriptors.isEmpty()){
