@@ -31,10 +31,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+
 
 import javax.annotation.Resource;
 import org.opengrid.data.meta.DatasetOptions;
@@ -44,6 +47,7 @@ import org.opengrid.util.ColorUtil;
 import org.opengrid.util.FileUtil;
 import org.opengrid.util.PropertiesManager;
 import org.opengrid.util.ServiceProperties;
+
 
 public class PlenarioDataProvider implements GenericRetrievable {
     
@@ -540,14 +544,16 @@ public class PlenarioDataProvider implements GenericRetrievable {
             
             String defaultAttribution = properties.getStringProperty("plenario.attribution.default");
             String defaultDataset = properties.getStringProperty("plenario.dataset.default");
-
+            int counter = 0;
+            
             while(itr.hasNext())
             {
-                OpenGridDataset dataset = getOpenGridDatasetFromPlenarioObject(defaultAttribution, defaultDataset, (JsonObject)itr.next(), includeColumns, cityOnly);
+                OpenGridDataset dataset = getOpenGridDatasetFromPlenarioObject(defaultAttribution, defaultDataset, (JsonObject)itr.next(), includeColumns, cityOnly, counter);
                 if(dataset != null)
                 {
                     openGridDatasets.add(dataset);
                 }
+                counter++;
                 //if(openGridDatasets.size()> 5)
                 //    break;    
             }
@@ -565,7 +571,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
 
     }
     
-    private OpenGridDataset getOpenGridDatasetFromPlenarioObject(String defaultAttribution, String defaultDataset, JsonObject jsonObject, boolean needColumns, boolean cityOnly) 
+    private OpenGridDataset getOpenGridDatasetFromPlenarioObject(String defaultAttribution, String defaultDataset, JsonObject jsonObject, boolean needColumns, boolean cityOnly, int datasetCounter) 
     throws ServiceException, JsonParseException, JsonMappingException, IOException
     {
         OpenGridDataset dataset = new OpenGridDataset();
@@ -582,7 +588,8 @@ public class PlenarioDataProvider implements GenericRetrievable {
         
         DatasetOptions options = new DatasetOptions();
         options.setLatLong("latitude,longitude");
-        String color = ColorUtil.GetRandomColor();
+        options.setCreationTimestamp(new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()));
+        String color = ColorUtil.GetColor(datasetCounter);
         
         Rendition rend = new Rendition();
         rend.setColor(color);
@@ -704,7 +711,7 @@ public class PlenarioDataProvider implements GenericRetrievable {
             
             String defaultAttribution = properties.getStringProperty("plenario.attribution.default");
             String defaultDataset = properties.getStringProperty("plenario.dataset.default");
-        
+            int counter = 0;
             while(itr.hasNext())
             {
                 JsonObject object = (JsonObject)itr.next();
@@ -712,10 +719,10 @@ public class PlenarioDataProvider implements GenericRetrievable {
                 
                 if(datasetName.equals(datasetId))
                 {
-                    dataset = getOpenGridDatasetFromPlenarioObject(defaultAttribution, defaultDataset, object, true, false);
+                    dataset = getOpenGridDatasetFromPlenarioObject(defaultAttribution, defaultDataset, object, true, false, counter);
                     break;
                 }
-                
+                counter++;
             }
             
             return dataset;

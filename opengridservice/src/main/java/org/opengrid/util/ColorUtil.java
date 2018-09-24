@@ -39,4 +39,8 @@ public class ColorUtil {
          Integer random = rand.nextInt(17);
         return dictionary.get(random);
      }
+     
+     public static String GetColor(int counter) {
+        return dictionary.get(counter % 17);
+     }
 }
